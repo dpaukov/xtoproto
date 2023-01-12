@@ -90,7 +90,9 @@ func getOrCreateCellParserForType(t reflect.Type) (cellParser, error) {
 	parser := defaultRegistry.cellParsers[t]
 	if parser == nil {
 		parser = &registeredCellParser{}
+		defaultRegistryMapMutex.Lock()
 		defaultRegistry.cellParsers[t] = parser
+		defaultRegistryMapMutex.Unlock()
 	}
 	if parser.impl != nil {
 		return parser, nil
@@ -99,7 +101,6 @@ func getOrCreateCellParserForType(t reflect.Type) (cellParser, error) {
 		parser.decoder = dec
 		return parser, nil
 	}
-	defaultRegistryMapMutex.Unlock()
 
 	return nil, fmt.Errorf("no cell parser registered for type %v", t)
 
